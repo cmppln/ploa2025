@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso ao Relatório Power BI</title>
     <style>
+        /* Centraliza o contêiner do formulário */
         #login-container {
             display: flex;
             flex-direction: column;
@@ -14,11 +15,13 @@
             text-align: center;
         }
 
+        /* Estilos do título */
         #login-title {
             font-size: 1.5em;
             margin-bottom: 20px;
         }
 
+        /* Estilos do formulário */
         #loginForm {
             display: flex;
             flex-direction: column;
@@ -26,6 +29,7 @@
             width: 300px;
         }
 
+        /* Contêiner para alinhar label e input */
         .form-group {
             display: flex;
             justify-content: space-between;
@@ -33,18 +37,21 @@
             margin-bottom: 10px;
         }
 
+        /* Estilos dos labels */
         label {
             width: 70px;
             text-align: right;
             margin-right: 10px;
         }
 
+        /* Estilos dos inputs */
         input {
             padding: 8px;
             width: 60%;
             box-sizing: border-box;
         }
 
+        /* Botão */
         button {
             width: 100%;
             padding: 10px;
@@ -55,12 +62,14 @@
             cursor: pointer;
         }
 
+        /* Estilo da mensagem de erro */
         #error {
             color: red;
             margin-top: 10px;
             text-align: center;
         }
 
+        /* Define o iframe para ocupar toda a tela */
         #powerbiFrame {
             display: none;
             position: absolute;
@@ -88,11 +97,9 @@
             <div id="error" style="display: none;">Usuário ou senha inválidos.</div>
         </form>
     </div>
-
-    <iframe id="powerbiFrame"></iframe>
-
+    <iframe id="powerbiFrame" src=""></iframe>
     <script>
-        const vercelUrl = "https://ploa2025.vercel.app/api/login";
+        const vercelUrl = "https://cmppln.vercel.app/api/login";
 
         document.getElementById('loginForm').onsubmit = function(event) {
             event.preventDefault();
