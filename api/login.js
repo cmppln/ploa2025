@@ -1,6 +1,6 @@
 export default function handler(req, res) {
     // Cabeçalhos para permitir CORS
-    res.setHeader("Access-Control-Allow-Origin", "https://camarapaulinia.github.io");
+    res.setHeader("Access-Control-Allow-Origin", "https://cmppln.github.io");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
