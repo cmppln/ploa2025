@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import jwt from 'jsonwebtoken';
 
 export default function handler(req, res) {
     // Cabeçalhos para permitir CORS
@@ -19,18 +19,19 @@ export default function handler(req, res) {
     const validPassword = process.env.PASSWORD;
 
     if (username === validUser && password === validPassword) {
-        // Criar token temporário para proteger o link do Power BI
+        // Criar token JWT para proteger o link do Power BI
         const secretKey = process.env.SECRET_KEY || "chave_secreta";
-        const expiresIn = 5 * 60 * 1000; // 5 minutos de validade
-        const timestamp = Date.now() + expiresIn;
-        const token = crypto
-            .createHmac("sha256", secretKey)
-            .update(String(timestamp))
-            .digest("hex");
+        const expiresIn = '5m'; // 5 minutos de validade
 
-        const linkPowerBI = `${process.env.POWER_BI_LINK}?token=${token}&expires=${timestamp}`;
+        // Criar o payload com o link do Power BI
+        const payload = {
+            link: process.env.POWER_BI_LINK
+        };
 
-        // Responder com HTML ofuscado
+        // Gerar o token JWT
+        const token = jwt.sign(payload, secretKey, { expiresIn });
+
+        // Responder com HTML ofuscado, com o token JWT
         res.setHeader("Content-Type", "text/html");
         res.status(200).send(`
             <!DOCTYPE html>
@@ -55,7 +56,7 @@ export default function handler(req, res) {
                 </style>
             </head>
             <body>
-                <iframe src="${linkPowerBI}" allowfullscreen></iframe>
+                <iframe src="/api/proxy?token=${token}" allowfullscreen></iframe>
             </body>
             </html>
         `);
