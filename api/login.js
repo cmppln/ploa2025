@@ -18,7 +18,10 @@ export default function handler(req, res) {
 
     // Validação das credenciais
     if (username === validUser && password === validPassword) {
-        // Responder com HTML para um iframe do Power BI ao invés do link diretamente
+        // Link do Power BI codificado (Base64 para simplicidade)
+        const encodedLink = Buffer.from(process.env.POWER_BI_LINK).toString('base64');
+
+        // Responder com HTML contendo o iframe
         res.setHeader("Content-Type", "text/html");
         res.status(200).send(`
             <!DOCTYPE html>
@@ -43,7 +46,13 @@ export default function handler(req, res) {
                 </style>
             </head>
             <body>
-                <iframe src="${process.env.POWER_BI_LINK}" allowfullscreen></iframe>
+                <iframe id="powerbiFrame"></iframe>
+                <script>
+                    // Decodificar o link no cliente
+                    const encodedLink = "${encodedLink}";
+                    const decodedLink = atob(encodedLink);
+                    document.getElementById('powerbiFrame').src = decodedLink;
+                </script>
             </body>
             </html>
         `);
