@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso ao Relatório Power BI</title>
     <style>
-        /* Centraliza o contêiner do formulário */
         #login-container {
             display: flex;
             flex-direction: column;
@@ -14,44 +13,38 @@
             height: 100vh;
             text-align: center;
         }
-        
-        /* Estilos do título */
+
         #login-title {
             font-size: 1.5em;
             margin-bottom: 20px;
         }
 
-        /* Estilos do formulário */
         #loginForm {
             display: flex;
             flex-direction: column;
-            align-items: flex-end; /* Alinha os campos à direita */
+            align-items: flex-end;
             width: 300px;
         }
-        
-        /* Contêiner para alinhar label e input */
+
         .form-group {
             display: flex;
             justify-content: space-between;
             width: 100%;
             margin-bottom: 10px;
         }
-        
-        /* Estilos dos labels */
+
         label {
             width: 70px;
             text-align: right;
             margin-right: 10px;
         }
 
-        /* Estilos dos inputs */
         input {
             padding: 8px;
             width: 60%;
             box-sizing: border-box;
         }
 
-        /* Botão */
         button {
             width: 100%;
             padding: 10px;
@@ -61,15 +54,13 @@
             border: none;
             cursor: pointer;
         }
-        
-        /* Estilo da mensagem de erro */
+
         #error {
             color: red;
             margin-top: 10px;
             text-align: center;
         }
 
-        /* Define o iframe para ocupar toda a tela */
         #powerbiFrame {
             display: none;
             position: absolute;
@@ -83,9 +74,7 @@
 </head>
 <body>
     <div id="login-container">
-        <!-- Título acima do formulário -->
         <h2 id="login-title">Acessar Relatório do Power BI</h2>
-        
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">Usuário:</label>
@@ -100,7 +89,7 @@
         </form>
     </div>
 
-    <iframe id="powerbiFrame" src=""></iframe>
+    <iframe id="powerbiFrame"></iframe>
 
     <script>
         const vercelUrl = "https://ploa2025.vercel.app/api/login";
