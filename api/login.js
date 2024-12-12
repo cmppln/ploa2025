@@ -1,10 +1,12 @@
+import crypto from "crypto";
+
 export default function handler(req, res) {
     // Cabeçalhos para permitir CORS
     res.setHeader("Access-Control-Allow-Origin", "https://cmppln.github.io");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // Método OPTIONS para lidar com requisições de pré-voo (CORS)
+    // Método OPTIONS para requisições de pré-voo (CORS)
     if (req.method === "OPTIONS") {
         res.status(200).end();
         return;
@@ -16,12 +18,19 @@ export default function handler(req, res) {
     const validUser = process.env.USERNAME;
     const validPassword = process.env.PASSWORD;
 
-    // Validação das credenciais
     if (username === validUser && password === validPassword) {
-        // Link do Power BI codificado (Base64 para simplicidade)
-        const encodedLink = Buffer.from(process.env.POWER_BI_LINK).toString('base64');
+        // Criar token temporário para proteger o link do Power BI
+        const secretKey = process.env.SECRET_KEY || "chave_secreta";
+        const expiresIn = 5 * 60 * 1000; // 5 minutos de validade
+        const timestamp = Date.now() + expiresIn;
+        const token = crypto
+            .createHmac("sha256", secretKey)
+            .update(String(timestamp))
+            .digest("hex");
 
-        // Responder com HTML contendo o iframe
+        const linkPowerBI = `${process.env.POWER_BI_LINK}?token=${token}&expires=${timestamp}`;
+
+        // Responder com HTML ofuscado
         res.setHeader("Content-Type", "text/html");
         res.status(200).send(`
             <!DOCTYPE html>
@@ -46,13 +55,7 @@ export default function handler(req, res) {
                 </style>
             </head>
             <body>
-                <iframe id="powerbiFrame"></iframe>
-                <script>
-                    // Decodificar o link no cliente
-                    const encodedLink = "${encodedLink}";
-                    const decodedLink = atob(encodedLink);
-                    document.getElementById('powerbiFrame').src = decodedLink;
-                </script>
+                <iframe src="${linkPowerBI}" allowfullscreen></iframe>
             </body>
             </html>
         `);
