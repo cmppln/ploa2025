@@ -1,21 +1,21 @@
 import crypto from "crypto";
 
 export default function handler(req, res) {
-    // Cabeçalhos para permitir CORS
-    res.setHeader("Access-Control-Allow-Origin", "https://ploa2025.vercel.app"); // Domínio do frontend
+    // Adicionando os cabeçalhos para permitir CORS
+    res.setHeader("Access-Control-Allow-Origin", "https://ploa2025.vercel.app"); // Substitua pelo domínio do frontend
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // Método OPTIONS para requisições de pré-voo (CORS)
+    // Tratamento para requisições de pré-voo (OPTIONS)
     if (req.method === "OPTIONS") {
         res.status(200).end();
         return;
     }
 
-    // Desestruturando os dados recebidos no corpo da requisição
-    const { username, password } = req.body;
+    // Desestruturando o corpo da requisição
+    const { username, password } = req.body || {};
 
-    // Credenciais válidas no backend (definidas como variáveis de ambiente no Vercel)
+    // Credenciais válidas
     const validUser = process.env.USERNAME;
     const validPassword = process.env.PASSWORD;
 
@@ -31,7 +31,7 @@ export default function handler(req, res) {
 
         const linkPowerBI = `${process.env.POWER_BI_LINK}?token=${token}&expires=${timestamp}`;
 
-        // Responder com HTML ofuscado
+        // Retornar o HTML para o iframe
         res.setHeader("Content-Type", "text/html");
         res.status(200).send(`
             <!DOCTYPE html>
@@ -61,7 +61,7 @@ export default function handler(req, res) {
             </html>
         `);
     } else {
-        // Responder com status de erro se as credenciais forem inválidas
+        // Retornar erro de autenticação
         res.status(401).json({ success: false });
     }
 }
