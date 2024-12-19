@@ -99,36 +99,43 @@
     </div>
     <iframe id="powerbiFrame" src=""></iframe>
     <script>
-        const vercelUrl = "https://cmppln.vercel.app/api/login";
+        // URL da API no Vercel
+        const apiUrl = "https://cmppln.vercel.app/api/login";
 
         document.getElementById('loginForm').onsubmit = function(event) {
             event.preventDefault();
 
+            // Capturar os dados do formulário
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            fetch(vercelUrl, {
+            // Fazer a requisição ao backend
+            fetch(apiUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
             })
             .then(response => {
                 if (response.ok) {
-                    return response.text();
+                    return response.json(); // Lida com a resposta JSON
                 } else {
                     throw new Error("Usuário ou senha inválidos.");
                 }
             })
-            .then(htmlContent => {
-                const iframe = document.getElementById('powerbiFrame');
-                iframe.srcdoc = htmlContent;
-                iframe.style.display = 'block';
-                document.getElementById('login-container').style.display = 'none';
+            .then(data => {
+                if (data.success) {
+                    // Exibe o relatório no iframe
+                    document.getElementById('powerbiFrame').src = data.link;
+                    document.getElementById('powerbiFrame').style.display = 'block';
+                    document.getElementById('login-container').style.display = 'none';
+                } else {
+                    throw new Error(data.message || "Erro desconhecido.");
+                }
             })
             .catch(error => {
-                const errorDiv = document.getElementById('error');
-                errorDiv.textContent = error.message;
-                errorDiv.style.display = 'block';
+                // Exibe a mensagem de erro
+                document.getElementById('error').textContent = error.message;
+                document.getElementById('error').style.display = 'block';
             });
         };
     </script>
