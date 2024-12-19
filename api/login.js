@@ -1,33 +1,53 @@
 export default function handler(req, res) {
-    // Configurar os cabeçalhos de CORS
-    res.setHeader("Access-Control-Allow-Origin", "https://ploa2025.vercel.app");
+    // Cabeçalhos para permitir CORS
+    res.setHeader("Access-Control-Allow-Origin", "https://cmppln.github.io");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // Responder a requisições OPTIONS (pré-voo do CORS)
+    // Método OPTIONS para lidar com requisições de pré-voo (CORS)
     if (req.method === "OPTIONS") {
         res.status(200).end();
         return;
     }
 
-    // Verificar o método POST
-    if (req.method !== "POST") {
-        res.status(405).json({ success: false, message: "Método não permitido" });
-        return;
-    }
-
     const { username, password } = req.body;
 
-    // Credenciais válidas
+    // Credenciais válidas no backend
     const validUser = process.env.USERNAME;
     const validPassword = process.env.PASSWORD;
 
+    // Validação das credenciais
     if (username === validUser && password === validPassword) {
-        const token = Math.random().toString(36).substring(2); // Token temporário simples
-        const linkPowerBI = process.env.POWER_BI_LINK;
-
-        res.status(200).json({ success: true, token, link: linkPowerBI });
+        // Responder com HTML para um iframe do Power BI ao invés do link diretamente
+        res.setHeader("Content-Type", "text/html");
+        res.status(200).send(`
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+                <title>Relatório Power BI</title>
+                <style>
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        width: 100%;
+                        height: 100%;
+                        overflow: hidden;
+                    }
+                    iframe {
+                        width: 100%;
+                        height: 100%;
+                        border: none;
+                    }
+                </style>
+            </head>
+            <body>
+                <iframe src="${process.env.POWER_BI_LINK}" allowfullscreen></iframe>
+            </body>
+            </html>
+        `);
     } else {
-        res.status(401).json({ success: false, message: "Usuário ou senha inválidos" });
+        res.status(401).json({ success: false });
     }
 }
