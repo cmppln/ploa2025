@@ -97,7 +97,7 @@
             <div id="error" style="display: none;">Usuário ou senha inválidos.</div>
         </form>
     </div>
-    <iframe id="powerbiFrame" src=""></iframe>
+    <iframe id="powerbiFrame" src="" sandbox="allow-scripts allow-same-origin"></iframe>
     <script>
         const vercelUrl = "https://cmppln.vercel.app/api/login";
 
@@ -120,13 +120,15 @@
                 }
             })
             .then(htmlContent => {
-                document.getElementById('powerbiFrame').srcdoc = htmlContent;
-                document.getElementById('powerbiFrame').style.display = 'block';
+                const iframe = document.getElementById('powerbiFrame');
+                iframe.srcdoc = htmlContent;
+                iframe.style.display = 'block';
                 document.getElementById('login-container').style.display = 'none';
             })
             .catch(error => {
-                document.getElementById('error').textContent = error.message;
-                document.getElementById('error').style.display = 'block';
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
             });
         };
     </script>
