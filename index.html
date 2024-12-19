@@ -14,7 +14,7 @@
             height: 100vh;
             text-align: center;
         }
-
+        
         /* Estilos do título */
         #login-title {
             font-size: 1.5em;
@@ -25,10 +25,10 @@
         #loginForm {
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
+            align-items: flex-end; /* Alinha os campos à direita */
             width: 300px;
         }
-
+        
         /* Contêiner para alinhar label e input */
         .form-group {
             display: flex;
@@ -36,7 +36,7 @@
             width: 100%;
             margin-bottom: 10px;
         }
-
+        
         /* Estilos dos labels */
         label {
             width: 70px;
@@ -61,7 +61,7 @@
             border: none;
             cursor: pointer;
         }
-
+        
         /* Estilo da mensagem de erro */
         #error {
             color: red;
@@ -83,7 +83,9 @@
 </head>
 <body>
     <div id="login-container">
+        <!-- Título acima do formulário -->
         <h2 id="login-title">Acessar Relatório do Power BI</h2>
+        
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">Usuário:</label>
@@ -97,43 +99,36 @@
             <div id="error" style="display: none;">Usuário ou senha inválidos.</div>
         </form>
     </div>
+
     <iframe id="powerbiFrame" src=""></iframe>
+
     <script>
-        // URL da API no Vercel
-        const apiUrl = "https://cmppln.vercel.app/api/login";
+        const vercelUrl = "https://ploa2025.vercel.app/api/login";
 
         document.getElementById('loginForm').onsubmit = function(event) {
             event.preventDefault();
 
-            // Capturar os dados do formulário
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            // Fazer a requisição ao backend
-            fetch(apiUrl, {
+            fetch(vercelUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
             })
             .then(response => {
                 if (response.ok) {
-                    return response.json(); // Lida com a resposta JSON
+                    return response.text();
                 } else {
                     throw new Error("Usuário ou senha inválidos.");
                 }
             })
-            .then(data => {
-                if (data.success) {
-                    // Exibe o relatório no iframe
-                    document.getElementById('powerbiFrame').src = data.link;
-                    document.getElementById('powerbiFrame').style.display = 'block';
-                    document.getElementById('login-container').style.display = 'none';
-                } else {
-                    throw new Error(data.message || "Erro desconhecido.");
-                }
+            .then(htmlContent => {
+                document.getElementById('powerbiFrame').srcdoc = htmlContent;
+                document.getElementById('powerbiFrame').style.display = 'block';
+                document.getElementById('login-container').style.display = 'none';
             })
             .catch(error => {
-                // Exibe a mensagem de erro
                 document.getElementById('error').textContent = error.message;
                 document.getElementById('error').style.display = 'block';
             });
