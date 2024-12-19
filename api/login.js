@@ -1,8 +1,8 @@
-import jwt from 'jsonwebtoken';
+import crypto from "crypto";
 
 export default function handler(req, res) {
     // Cabeçalhos para permitir CORS
-    res.setHeader("Access-Control-Allow-Origin", "https://ploa2025.vercel.app");
+    res.setHeader("Access-Control-Allow-Origin", "https://ploa2025.vercel.app"); // Domínio do frontend
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -12,26 +12,26 @@ export default function handler(req, res) {
         return;
     }
 
+    // Desestruturando os dados recebidos no corpo da requisição
     const { username, password } = req.body;
 
-    // Credenciais válidas no backend
+    // Credenciais válidas no backend (definidas como variáveis de ambiente no Vercel)
     const validUser = process.env.USERNAME;
     const validPassword = process.env.PASSWORD;
 
     if (username === validUser && password === validPassword) {
-        // Criar token JWT para proteger o link do Power BI
+        // Criar token temporário para proteger o link do Power BI
         const secretKey = process.env.SECRET_KEY || "chave_secreta";
-        const expiresIn = '5m'; // 5 minutos de validade
+        const expiresIn = 5 * 60 * 1000; // 5 minutos de validade
+        const timestamp = Date.now() + expiresIn;
+        const token = crypto
+            .createHmac("sha256", secretKey)
+            .update(String(timestamp))
+            .digest("hex");
 
-        // Criar o payload com o link do Power BI
-        const payload = {
-            link: process.env.POWER_BI_LINK
-        };
+        const linkPowerBI = `${process.env.POWER_BI_LINK}?token=${token}&expires=${timestamp}`;
 
-        // Gerar o token JWT
-        const token = jwt.sign(payload, secretKey, { expiresIn });
-
-        // Responder com HTML ofuscado, com o token JWT
+        // Responder com HTML ofuscado
         res.setHeader("Content-Type", "text/html");
         res.status(200).send(`
             <!DOCTYPE html>
@@ -56,11 +56,12 @@ export default function handler(req, res) {
                 </style>
             </head>
             <body>
-                <iframe src="/api/proxy?token=${token}" allowfullscreen></iframe>
+                <iframe src="${linkPowerBI}" allowfullscreen></iframe>
             </body>
             </html>
         `);
     } else {
+        // Responder com status de erro se as credenciais forem inválidas
         res.status(401).json({ success: false });
     }
 }
